@@ -3,30 +3,46 @@ import AddVideoLink from './Components/AddVideoLink'
 import './App.css'
 import CaptionList from './Components/CaptionList'
 import CaptionInput from './Components/CaptionInput'
+import YouTubePlayer from './Components/YouTubePlayer'
 
 function App() {
   const [videoUrl, setVideoUrl] = useState('')
   const [captions, setCaptions] = useState([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [error, setError] = useState(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [currentCaption, setCurrentCaption] = useState(null)
   const videoRef = useRef(null)
+
+  useEffect(() => {
+    let interval
+    if (isPlaying) {
+      interval = setInterval(() => {
+        if (videoRef.current) {
+          const time = videoRef.current.getCurrentTime()
+          setCurrentTime(time)
+          
+          const activeCaption = captions.find(
+            caption => time >= caption.startTime && time <= caption.endTime
+          )
+          setCurrentCaption(activeCaption)
+        }
+      }, 100)
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [isPlaying, captions])
 
   const handleAddCaption = (newCaption) => {
     setCaptions([...captions, newCaption])
   }
 
   const handlePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause()
-      } else {
-        videoRef.current.play().catch(err => {
-          setError('Failed to play video: ' + err.message)
-          setIsPlaying(false)
-        })
-      }
-      setIsPlaying(!isPlaying)
-    }
+    setIsPlaying(!isPlaying)
   }
 
   const handleVideoError = (e) => {
@@ -36,13 +52,12 @@ function App() {
 
   const getYouTubeEmbedUrl = (url) => {
     try {
-      // Handle different YouTube URL formats
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
       const match = url.match(regExp);
       
       if (match && match[2].length === 11) {
-        // Return embed URL
-        return `https://www.youtube.com/embed/${match[2]}`;
+        // Return the original URL instead of converting to embed URL
+        return url;
       }
       return null;
     } catch (error) {
@@ -69,15 +84,21 @@ function App() {
       <div className="main-content">
         {videoUrl && (
           <div className="video-container">
-            <iframe
-              width="100%"
-              height="400"
-              src={videoUrl}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title="YouTube video player"
-            ></iframe>
+            <YouTubePlayer
+              videoUrl={videoUrl}
+              onTimeUpdate={(time) => {
+                setCurrentTime(time)
+                const activeCaption = captions.find(
+                  caption => time >= caption.startTime && time <= caption.endTime
+                )
+                setCurrentCaption(activeCaption)
+
+              }}
+              isPlaying={isPlaying}
+              onPlayPause={setIsPlaying}
+              ref={videoRef}
+              
+            />
             <div className="video-controls">
               <button 
                 onClick={handlePlayPause}
@@ -86,6 +107,13 @@ function App() {
                 {isPlaying ? '⏸️ Pause' : '▶️ Play'}
               </button>
             </div>
+            
+              <div className="current-caption">
+              {currentCaption?.text || "No Caption"}  
+              </div>
+             
+              
+
           </div>
         )}
         
