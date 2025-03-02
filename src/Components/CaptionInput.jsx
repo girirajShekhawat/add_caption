@@ -20,8 +20,8 @@ function CaptionInput({ onAddCaption }) {
   return (
     <form onSubmit={handleSubmit} className="caption-form">
       <div className="form-group">
-        <label>Caption Text:</label>
         <textarea
+          className='w-[90%]   border-1 border-gray-300 rounded-[10px] px-[12px] py-4 text-sm'
           value={captionText}
           onChange={(e) => setCaptionText(e.target.value)}
           required
@@ -33,6 +33,7 @@ function CaptionInput({ onAddCaption }) {
         <div className="form-group">
           <label>Start Time (seconds):</label>
           <input
+            className='w-[90%]   border-1 border-gray-300 rounded-[10px] px-[12px] py-4 text-sm'
             type="number"
             step="0.1"
             value={startTime}
@@ -45,6 +46,7 @@ function CaptionInput({ onAddCaption }) {
         <div className="form-group">
           <label>End Time (seconds):</label>
           <input
+            className='w-[90%] border-1 border-gray-300 rounded-[10px] px-[12px] py-4 text-sm'
             type="number"
             step="0.1"
             value={endTime}
@@ -55,7 +57,7 @@ function CaptionInput({ onAddCaption }) {
         </div>
       </div>
       
-      <button type="submit">Add Caption</button>
+      <button type="submit" className='w-[150px] mx-auto cursor-pointer bg-black text-white rounded-[50px] px-[12px] py-2'>Add Caption</button>
     </form>
   )
 }

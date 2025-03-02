@@ -86,7 +86,7 @@ function App() {
           <div className="video-container">
             <YouTubePlayer
               videoUrl={videoUrl}
-              onTimeUpdate={(time) => {
+              onTimeUpdate={(time) => { 
                 setCurrentTime(time)
                 const activeCaption = captions.find(
                   caption => time >= caption.startTime && time <= caption.endTime
@@ -98,7 +98,7 @@ function App() {
               onPlayPause={setIsPlaying}
               ref={videoRef}
               
-            />
+            /> 
             <div className="video-controls">
               <button 
                 onClick={handlePlayPause}
